@@ -28,11 +28,13 @@
 </head>
 <body>
 <div id="root"></div>
-<script type="module" src="./app.bundle.1786354511.js"></script>
+<script type="module" src="./app.bundle.1786354927.js"></script>
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(() => {});
+      navigator.serviceWorker.register("./sw.js").catch((err) => {
+        console.error("Service Worker registration failed:", err);
+      });
     });
   }
 </script>
