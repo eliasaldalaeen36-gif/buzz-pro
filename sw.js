@@ -1,8 +1,11 @@
 // BUZZ Pro — Service Worker
 // استراتيجية "الشبكة أولًا": يحاول جلب أحدث نسخة دائمًا عند توفر الإنترنت،
-// ولا يستخدم النسخة المخزَّنة إلا عند انعدام الاتصال فعليًا — هذا يمنع تكرار
-// مشكلة "الشاشة القديمة المخزَّنة" التي واجهناها سابقًا مع اسم الملف الثابت.
-const CACHE_NAME = "buzzpro-v1";
+// ولا يستخدم النسخة المخزَّنة إلا عند انعدام الاتصال فعليًا.
+//
+// إصلاح جوهري: اسم الذاكرة المؤقتة الآن يتغيّر تلقائيًا مع كل نشر جديد
+// (بدل اسم ثابت لا يتغيّر أبدًا) — هذا يضمن مسح كل الملفات القديمة المخزَّنة
+// فعليًا عند كل تحديث، بدل بقائها متراكمة إلى الأبد بصمت.
+const CACHE_NAME = "buzzpro-v2-20260820";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();
@@ -28,38 +31,8 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// استقبال إشعارات الدفع (Push) — تعمل حتى لو التطبيق مغلق تمامًا أو الهاتف مقفل،
-// طالما المتصفح مثبَّت والصلاحية مفعّلة (نفس آلية أي تطبيق حقيقي يرسل إشعارات).
-self.addEventListener("push", (event) => {
-  let data = { title: "BUZZ Pro", body: "لديك تنبيه جديد", url: "/" };
-  try { if (event.data) data = { ...data, ...event.data.json() }; } catch (e) { /* استخدام القيم الافتراضية أعلاه */ }
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "/icon-192.png",
-      badge: "/icon-192.png",
-      dir: "rtl",
-      lang: "ar",
-      data: { url: data.url || "/" },
-    })
-  );
-});
-
-// الضغط على الإشعار يفتح التطبيق (أو يركّز على تبويب مفتوح مسبقًا إن وُجد)
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || "/";
-  event.waitUntil(
-    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientsArr) => {
-      for (const client of clientsArr) {
-        if ("focus" in client) return client.focus();
-      }
-      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
-    })
-  );
-});
-
 // إشعارات فعلية — تعمل حتى لو التطبيق مغلق تمامًا أو الهاتف بجيب صاحبه
+// (معالج واحد فقط الآن — كان مُسجَّلًا مرتين بالخطأ سابقًا)
 self.addEventListener("push", (event) => {
   let payload = { title: "BUZZ Pro", body: "لديك تنبيه جديد.", severity: "warning" };
   try { if (event.data) payload = { ...payload, ...event.data.json() }; } catch (e) {}
