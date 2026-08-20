@@ -179,6 +179,19 @@ end`};t.events.push(["putFont",function(i){(function(a){var s=a.font,l=a.out,c=a
         @media (min-width: 860px) {
           .buzz-sidebar { display: block !important; }
         }
+        @media (max-width: 859px) {
+          .buzz-sidebar {
+            position: fixed !important;
+            top: 46px !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            left: auto !important;
+            height: auto !important;
+            z-index: 30;
+            box-shadow: -8px 0 24px rgba(0,0,0,0.25);
+          }
+        }
+        html, body { overflow-x: hidden; }
         * { -webkit-font-smoothing: antialiased; }
         input, select, button, textarea { font-family: inherit; }
         input, select, textarea { outline: none; }
